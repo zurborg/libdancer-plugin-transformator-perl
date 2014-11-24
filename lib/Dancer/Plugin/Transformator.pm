@@ -1,22 +1,13 @@
-package Dancer::Plugin::Transformator;
-
 use strict;
 use warnings;
+package Dancer::Plugin::Transformator;
+# ABSTRACT: Dancer plugin for Net::NodeTransformator
+
 use Dancer ':syntax';
 use Dancer::Plugin;
 use Net::NodeTransformator;
 
-=head1 NAME
-
-Dancer::Plugin::Transformator - Dancer plugin for Net::NodeTransformator
-
-=head1 VERSION
-
-Version 0.100
-
-=cut
-
-our $VERSION = '0.100';
+# VERSION
 our $CLASS = __PACKAGE__;
 
 =head1 SYNOPSIS
@@ -35,17 +26,11 @@ our $CLASS = __PACKAGE__;
 		return template 'index';
 	};
 
-=head1 DESCRIPTION	
-
-This plugin provides two methods to interact with L<Net::NodeTransformator>.
-
 =head1 PLUGIN CONFIGURATION
 
 The plugin needs only one setting, the C<connect> parameter. See documentation of L<Net::NodeTransformator> for more information about the syntax.
 
-=head1 METHODS
-
-=head2 C<< transform($engine, $input[, $data]) >>
+=method C<< transform($engine, $input[, $data]) >>
 
 A wrapper method for L<Net::NodeTransformator>::transform.
 
@@ -58,7 +43,7 @@ register transform => sub {
 	$nnt->transform($engine, $input, $data);
 };
 
-=head2 C<< transform_output($engine[, $data]) >>
+=method C<< transform_output($engine[, $data]) >>
 
 Creates an after-hook and transform the response content via specified engine. Multiple calls of this method causes the engines to be chained. In the synopsis example above, the content of the template output is first transformed via I<jade> and then minified. The argument C<$data> is only meaningful for I<jade> engine.
 
@@ -84,47 +69,12 @@ hook after => sub {
 
 register_plugin;
 
-=head1 AUTHOR
-
-David Zurborg, C<< <zurborg@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests through my project management tool
-at L<projects//issues/new>.  I
-will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Dancer::Plugin::Transformator
-
-You can also look for information at:
-
-=over 4
-
-=item * GitHub: Public repository of this module
-
-L<https://github.com/zurborg/libdancer-plugin-transformator-perl>
-
-=back
-
 =head2 SEE ALSO
 
 =over 4
 
-=item L<Net::NodeTransformator>
+=item * L<Net::NodeTransformator>
 
 =back
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2014 David Zurborg, all rights reserved.
-
-This program is released under the following license: ISC
-
-=cut
 
 1;
