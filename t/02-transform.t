@@ -1,19 +1,15 @@
 use Test::Most import => ['!pass'];
-use IPC::Run qw(start pump finish timeout);
-use Env::Path;
-use Try::Tiny;
+use Net::NodeTransformator;
 
 plan skip_all => 'transformator is required for this test' unless Env::Path->PATH->Whence('transformator');
 
-plan tests => 1;
+plan tests => 3;
 
-my $sock = './socket';
-unlink $sock if -e $sock;
+my $server = Net::NodeTransformator->standalone;
+ok $server;
 
-my ($in, $out, $err);
-my $server = start [ transformator => $sock ], \$in, \$out, \$err, timeout(10);
-
-pump $server until $out =~ /server bound/;
+my $socket = $server->{host}.':'.$server->{port};
+ok $socket;
 
 {
     package Webservice;
@@ -24,7 +20,7 @@ pump $server until $out =~ /server bound/;
 
 	set plugins => {
 		Transformator => {
-			connect => $sock,
+			connect => $socket,
 		}
 	};
 
@@ -45,7 +41,6 @@ is($R->{content} => '<html><body><span>Hi Peter!</span><script>(function(){var n
 
 diag sprintf "[%s] %s", $_->{level}, $_->{message} for @{read_logs()};
 
-$server->kill_kill;
-finish $server;
+$server->cleanup;
 
 done_testing;
