@@ -1,6 +1,8 @@
 use strict;
 use warnings;
+
 package Dancer::Plugin::Transformator;
+
 # ABSTRACT: Dancer plugin for Net::NodeTransformator
 
 use Dancer ':syntax';
@@ -37,10 +39,10 @@ A wrapper method for L<Net::NodeTransformator>::transform.
 =cut
 
 register transform => sub {
-	my ($engine, $input, $data) = @_;
-	my $config = plugin_setting;
-	my $nnt = Net::NodeTransformator->new($config->{connect});
-	$nnt->transform($engine, $input, $data);
+    my ( $engine, $input, $data ) = @_;
+    my $config = plugin_setting;
+    my $nnt    = Net::NodeTransformator->new( $config->{connect} );
+    $nnt->transform( $engine, $input, $data );
 };
 
 =method C<< transform_output($engine[, $data]) >>
@@ -50,21 +52,26 @@ Creates an after-hook and transform the response content via specified engine. M
 =cut
 
 register transform_output => sub {
-	my ($engine, $data) = @_;
-	var $CLASS = [] unless exists vars->{$CLASS};
-	push @{vars->{$CLASS}} => { engine => $engine, data => $data };
+    my ( $engine, $data ) = @_;
+    var $CLASS = [] unless exists vars->{$CLASS};
+    push @{ vars->{$CLASS} } => { engine => $engine, data => $data };
 };
 
 hook after => sub {
-	my $response = shift;
-	if (exists vars->{$CLASS}) {
-		my $config = plugin_setting;
-		my $nnt = Net::NodeTransformator->new($config->{connect});
-		my $transforms = delete vars->{$CLASS};
-		foreach my $transform (@$transforms) {
-			$response->content($nnt->transform($transform->{engine}, $response->content, $transform->{data}));
-		}
-	}
+    my $response = shift;
+    if ( exists vars->{$CLASS} ) {
+        my $config     = plugin_setting;
+        my $nnt        = Net::NodeTransformator->new( $config->{connect} );
+        my $transforms = delete vars->{$CLASS};
+        foreach my $transform (@$transforms) {
+            $response->content(
+                $nnt->transform(
+                    $transform->{engine}, $response->content,
+                    $transform->{data}
+                )
+            );
+        }
+    }
 };
 
 register_plugin;
