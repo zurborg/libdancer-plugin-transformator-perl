@@ -12,6 +12,21 @@ use Net::NodeTransformator;
 # VERSION
 our $CLASS = __PACKAGE__;
 
+our $NNT;
+
+sub _get_instance {
+    my $config = plugin_setting;
+    if ( $config->{connect} ) {
+        return Net::NodeTransformator->new( $config->{connect} );
+    }
+    else {
+        unless ($NNT) {
+            $NNT = Net::NodeTransformator->standalone;
+        }
+        return $NNT;
+    }
+}
+
 =head1 SYNOPSIS
 
 	use Dancer::Plugin::Transformator;
@@ -30,7 +45,7 @@ our $CLASS = __PACKAGE__;
 
 =head1 PLUGIN CONFIGURATION
 
-The plugin needs only one setting, the C<connect> parameter. See documentation of L<Net::NodeTransformator> for more information about the syntax.
+The plugin needs only one setting, the C<connect> parameter. See documentation of L<Net::NodeTransformator> for more information about the syntax. If omitted, a standalone server will be started.
 
 =method C<< transform($engine, $input[, $data]) >>
 
@@ -40,8 +55,7 @@ A wrapper method for L<Net::NodeTransformator>::transform.
 
 register transform => sub {
     my ( $engine, $input, $data ) = @_;
-    my $config = plugin_setting;
-    my $nnt    = Net::NodeTransformator->new( $config->{connect} );
+    my $nnt = _get_instance();
     $nnt->transform( $engine, $input, $data );
 };
 
@@ -60,8 +74,7 @@ register transform_output => sub {
 hook after => sub {
     my $response = shift;
     if ( exists vars->{$CLASS} ) {
-        my $config     = plugin_setting;
-        my $nnt        = Net::NodeTransformator->new( $config->{connect} );
+        my $nnt        = _get_instance();
         my $transforms = delete vars->{$CLASS};
         foreach my $transform (@$transforms) {
             $response->content(

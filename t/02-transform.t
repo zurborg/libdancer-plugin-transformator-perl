@@ -1,16 +1,11 @@
 use Test::Most import => ['!pass'];
+use Env::Path;
 use Net::NodeTransformator;
 
 plan skip_all => 'transformator is required for this test'
   unless Env::Path->PATH->Whence('transformator');
 
-plan tests => 3;
-
-my $server = Net::NodeTransformator->standalone;
-ok $server;
-
-my $socket = $server->{host} . ':' . $server->{port};
-ok $socket;
+plan tests => 1;
 
 {
 
@@ -19,12 +14,6 @@ ok $socket;
     use Dancer::Plugin::Transformator;
 
     set views => 't/views';
-
-    set plugins => {
-        Transformator => {
-            connect => $socket,
-        }
-    };
 
     get '/foo' => sub {
         transform_output jade => { name => 'Peter' };
@@ -44,7 +33,5 @@ is( $R->{content} =>
 );
 
 diag sprintf "[%s] %s", $_->{level}, $_->{message} for @{ read_logs() };
-
-$server->cleanup;
 
 done_testing;
