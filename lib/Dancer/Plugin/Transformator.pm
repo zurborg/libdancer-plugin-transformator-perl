@@ -7,7 +7,7 @@ package Dancer::Plugin::Transformator;
 
 use Dancer ':syntax';
 use Dancer::Plugin;
-use Net::NodeTransformator;
+use Net::NodeTransformator 0.105;
 
 # VERSION
 our $CLASS = __PACKAGE__;
